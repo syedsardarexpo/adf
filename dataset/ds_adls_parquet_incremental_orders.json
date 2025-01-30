@@ -1,0 +1,24 @@
+{
+	"name": "ds_adls_parquet_incremental_orders",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_gen2_product_cat",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "orders_incremental_@{formatDateTime(utcnow(), 'yyyyMMddHHmmss')}.parquet\n",
+					"type": "Expression"
+				},
+				"folderPath": "data/bronze/incremental/orders incremental/",
+				"fileSystem": "gcpl"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
