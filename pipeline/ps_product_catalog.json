@@ -269,7 +269,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_customers_adls",
+						"referenceName": "ds_orders_adls",
 						"type": "DatasetReference"
 					}
 				]
