@@ -1,0 +1,20 @@
+{
+	"name": "ds_adls_parquet_products",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_gen2_product_cat",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "data/bronze/fullload/product_catalog",
+				"fileSystem": "gcpl"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
