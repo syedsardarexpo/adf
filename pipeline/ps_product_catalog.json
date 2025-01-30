@@ -21,12 +21,14 @@
 						"partitionOption": "None"
 					},
 					"sink": {
-						"type": "ParquetSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
-							"type": "ParquetWriteSettings"
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
 						}
 					},
 					"enableStaging": false,
@@ -133,7 +135,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_product_catalog_adls",
+						"referenceName": "ds_csv_product",
 						"type": "DatasetReference"
 					}
 				]
