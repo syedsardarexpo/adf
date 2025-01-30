@@ -35,86 +35,64 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "CustomerID",
+									"name": "ProductID",
 									"type": "Int32",
 									"physicalType": "int"
 								},
 								"sink": {
-									"name": "CustomerID",
+									"name": "ProductID",
 									"type": "Int32",
 									"physicalType": "INT_32"
 								}
 							},
 							{
 								"source": {
-									"name": "Name",
+									"name": "ProductName",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "Name",
+									"name": "ProductName",
 									"type": "String",
 									"physicalType": "UTF8"
 								}
 							},
 							{
 								"source": {
-									"name": "Address",
+									"name": "Category",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "Address",
+									"name": "Category",
 									"type": "String",
 									"physicalType": "UTF8"
 								}
 							},
 							{
 								"source": {
-									"name": "Email",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "Price",
+									"type": "Decimal",
+									"physicalType": "decimal",
+									"scale": 2,
+									"precision": 10
 								},
 								"sink": {
-									"name": "Email",
-									"type": "String",
-									"physicalType": "UTF8"
+									"name": "Price",
+									"type": "Decimal",
+									"physicalType": "DECIMAL"
 								}
 							},
 							{
 								"source": {
-									"name": "StartDate",
+									"name": "LastUpdated",
 									"type": "DateTime",
 									"physicalType": "datetime"
 								},
 								"sink": {
-									"name": "StartDate",
+									"name": "LastUpdated",
 									"type": "DateTime",
 									"physicalType": "INT_96"
-								}
-							},
-							{
-								"source": {
-									"name": "EndDate",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								},
-								"sink": {
-									"name": "EndDate",
-									"type": "DateTime",
-									"physicalType": "INT_96"
-								}
-							},
-							{
-								"source": {
-									"name": "IsCurrent",
-									"type": "String",
-									"physicalType": "char"
-								},
-								"sink": {
-									"name": "IsCurrent",
-									"type": "String",
-									"physicalType": "UTF8"
 								}
 							}
 						],
@@ -171,6 +149,18 @@
 						"mappings": [
 							{
 								"source": {
+									"name": "OrderID",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "OrderID",
+									"type": "Int32",
+									"physicalType": "INT_32"
+								}
+							},
+							{
+								"source": {
 									"name": "CustomerID",
 									"type": "Int32",
 									"physicalType": "int"
@@ -183,74 +173,40 @@
 							},
 							{
 								"source": {
-									"name": "Name",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "Name",
-									"type": "String",
-									"physicalType": "UTF8"
-								}
-							},
-							{
-								"source": {
-									"name": "Address",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "Address",
-									"type": "String",
-									"physicalType": "UTF8"
-								}
-							},
-							{
-								"source": {
-									"name": "Email",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "Email",
-									"type": "String",
-									"physicalType": "UTF8"
-								}
-							},
-							{
-								"source": {
-									"name": "StartDate",
+									"name": "OrderDate",
 									"type": "DateTime",
 									"physicalType": "datetime"
 								},
 								"sink": {
-									"name": "StartDate",
+									"name": "OrderDate",
 									"type": "DateTime",
 									"physicalType": "INT_96"
 								}
 							},
 							{
 								"source": {
-									"name": "EndDate",
-									"type": "DateTime",
-									"physicalType": "datetime"
+									"name": "Amount",
+									"type": "Decimal",
+									"physicalType": "decimal",
+									"scale": 2,
+									"precision": 10
 								},
 								"sink": {
-									"name": "EndDate",
-									"type": "DateTime",
-									"physicalType": "INT_96"
+									"name": "Amount",
+									"type": "Decimal",
+									"physicalType": "DECIMAL"
 								}
 							},
 							{
 								"source": {
-									"name": "IsCurrent",
-									"type": "String",
-									"physicalType": "char"
+									"name": "LastUpdated",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								},
 								"sink": {
-									"name": "IsCurrent",
-									"type": "String",
-									"physicalType": "UTF8"
+									"name": "LastUpdated",
+									"type": "DateTime",
+									"physicalType": "INT_96"
 								}
 							}
 						],
