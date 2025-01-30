@@ -1,5 +1,5 @@
 {
-	"name": "ds_orders_incremental",
+	"name": "ds_orders_sql_incremental",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_sqldatabase",

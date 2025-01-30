@@ -1,5 +1,5 @@
 {
-	"name": "ds_customers_scd",
+	"name": "ds_customers_sql_scd",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_sqldatabase",
