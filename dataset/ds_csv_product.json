@@ -1,0 +1,23 @@
+{
+	"name": "ds_csv_product",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_gen2_product_cat",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "data/bronze/fullload",
+				"fileSystem": "gcpl"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
