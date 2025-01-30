@@ -21,14 +21,12 @@
 						"partitionOption": "None"
 					},
 					"sink": {
-						"type": "DelimitedTextSink",
+						"type": "ParquetSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
+							"type": "ParquetWriteSettings"
 						}
 					},
 					"enableStaging": false,
@@ -129,13 +127,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_customers_sql_scd",
+						"referenceName": "ds_product_catalog_sql_fullrefresh",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_csv_product",
+						"referenceName": "ds_product_catalog_adls",
 						"type": "DatasetReference"
 					}
 				]
@@ -265,7 +263,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_customers_sql_scd",
+						"referenceName": "ds_orders_sql_incremental",
 						"type": "DatasetReference"
 					}
 				],
