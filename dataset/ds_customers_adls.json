@@ -1,5 +1,5 @@
 {
-	"name": "Parquet1",
+	"name": "ds_customers_adls",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_adls_gen2_product_cat",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "data/bronze",
+				"folderPath": "data/bronze/SCD/customers_scd",
 				"fileSystem": "gcpl"
 			},
 			"compressionCodec": "snappy"
