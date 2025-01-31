@@ -381,17 +381,19 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select  * from [dbo].[Orders_Incremental] where lastupdated >= (select max(LastUpdated) from [dbo].[WatermarkTable])",
+						"sqlReaderQuery": "select  * from [dbo].[Orders_Incremental] where lastupdated > (select max(LastUpdated) from [dbo].[WatermarkTable])",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"sink": {
-						"type": "ParquetSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
-							"type": "ParquetWriteSettings"
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
 						}
 					},
 					"enableStaging": false,
@@ -476,7 +478,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_adls_parquet_incremental_orders",
+						"referenceName": "ds_csv_product",
 						"type": "DatasetReference"
 					}
 				]
