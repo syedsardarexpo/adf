@@ -381,7 +381,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select  * from [dbo].[Orders_Incremental] where lastupdated > (select max(LastUpdated) from [dbo].[WatermarkTable])",
+						"sqlReaderQuery": "select  * from [dbo].[Orders_Incremental] where lastupdated > (select max(LastUpdated) from [dbo].[WatermarkTable] where Tablename = 'Orders_Incremental')",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -482,8 +482,8 @@
 				]
 			},
 			{
-				"name": "Stored procedure1",
-				"type": "SqlServerStoredProcedure",
+				"name": "update watermark",
+				"type": "Script",
 				"dependsOn": [
 					{
 						"activity": "Copy data Orders incremental",
@@ -500,12 +500,18 @@
 					"secureInput": false
 				},
 				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[update_watermark]"
-				},
 				"linkedServiceName": {
 					"referenceName": "ls_sqldatabase",
 					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "UPDATE WatermarkTable\nSET LastUpdated = (SELECT MAX(LastUpdated) FROM Orders_Incremental) \nwhere Tablename = 'Orders_Incremental'"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
