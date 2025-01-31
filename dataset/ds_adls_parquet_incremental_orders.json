@@ -11,13 +11,13 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "orders_incremental_@{formatDateTime(utcnow(), 'yyyyMMddHHmmss')}.parquet\n",
+					"value": "\n",
 					"type": "Expression"
 				},
 				"folderPath": "data/bronze/incremental/orders incremental/",
 				"fileSystem": "gcpl"
 			},
-			"compressionCodec": "snappy"
+			"compressionCodec": null
 		},
 		"schema": []
 	}
