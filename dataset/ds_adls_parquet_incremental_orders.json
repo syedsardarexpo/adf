@@ -17,7 +17,7 @@
 				"folderPath": "data/bronze/incremental/orders incremental/",
 				"fileSystem": "gcpl"
 			},
-			"compressionCodec": null
+			"compressionCodec": "snappy"
 		},
 		"schema": []
 	}
