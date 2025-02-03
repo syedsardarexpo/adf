@@ -1,0 +1,12 @@
+{
+	"name": "ds_azuresql_dyanamic_tables",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqldatabase",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
