@@ -1,0 +1,20 @@
+{
+	"name": "ds_adls_dynamic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_gen2_product_cat",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "data/staging/Test",
+				"fileSystem": "gcpl"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
