@@ -8,13 +8,13 @@
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
+			"sheetName": "config",
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": "config_file.xlsx",
 				"folderPath": "config",
 				"fileSystem": "gcpl"
 			},
-			"sheetIndex": 1,
 			"firstRowAsHeader": true
 		},
 		"schema": [
