@@ -1,0 +1,77 @@
+{
+	"name": "ds_adls_config",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_gen2_product_cat",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"table_name": {
+				"type": "string"
+			},
+			"table_type": {
+				"type": "string"
+			},
+			"incremental_key": {
+				"type": "string"
+			},
+			"destination": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "config_file.xlsx",
+				"folderPath": "config",
+				"fileSystem": "gcpl"
+			},
+			"sheetIndex": 1,
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "srno",
+				"type": "String"
+			},
+			{
+				"name": "table_type",
+				"type": "String"
+			},
+			{
+				"name": "Pipeline_run_frequency",
+				"type": "String"
+			},
+			{
+				"name": "source",
+				"type": "String"
+			},
+			{
+				"name": "table_name",
+				"type": "String"
+			},
+			{
+				"name": "created_date",
+				"type": "String"
+			},
+			{
+				"name": "column & datatype",
+				"type": "String"
+			},
+			{
+				"name": "primary_key",
+				"type": "String"
+			},
+			{
+				"name": "Incremental_key",
+				"type": "String"
+			},
+			{
+				"name": "destination",
+				"type": "String"
+			}
+		]
+	}
+}
