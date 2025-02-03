@@ -5,6 +5,20 @@
 			"referenceName": "ls_sqldatabase",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"table_name": {
+				"type": "string"
+			},
+			"table_type": {
+				"type": "string"
+			},
+			"Incremental_key": {
+				"type": "string"
+			},
+			"destination": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": []
