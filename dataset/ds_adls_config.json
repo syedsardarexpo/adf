@@ -5,20 +5,6 @@
 			"referenceName": "ls_adls_gen2_product_cat",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"table_name": {
-				"type": "string"
-			},
-			"table_type": {
-				"type": "string"
-			},
-			"incremental_key": {
-				"type": "string"
-			},
-			"destination": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
