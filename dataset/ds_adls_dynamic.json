@@ -5,11 +5,20 @@
 			"referenceName": "ls_adls_gen2_product_cat",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"table_name": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().table_name",
+					"type": "Expression"
+				},
 				"folderPath": "data/staging/Test",
 				"fileSystem": "gcpl"
 			},
