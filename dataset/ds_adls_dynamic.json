@@ -19,7 +19,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@concat(dataset().table_name,utcNow())",
+					"value": "@concat(dataset().table_name, '_', formatDateTime(utcNow(), 'yyyyMMdd_HHmmss'), '.parquet')\n",
 					"type": "Expression"
 				},
 				"fileSystem": {

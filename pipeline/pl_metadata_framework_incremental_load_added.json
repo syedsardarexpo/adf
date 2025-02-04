@@ -152,7 +152,10 @@
 												"typeProperties": {
 													"source": {
 														"type": "AzureSqlSource",
-														"sqlReaderQuery": "select  * from @{item().schema}.@{item().table_name} where lastupdated > (select max(LastUpdated) from [dbo].[WatermarkTable] where Tablename = 'Orders_Incremental')",
+														"sqlReaderQuery": {
+															"value": "select  * from @{item().schema}.@{item().table_name} where @{item().Incremental_key} > (select max(LastUpdated) from [dbo].[WatermarkTable] where Tablename = '@{item().table_name}')",
+															"type": "Expression"
+														},
 														"queryTimeout": "00:12:00",
 														"partitionOption": "None"
 													},
@@ -271,6 +274,42 @@
 														}
 													}
 												]
+											},
+											{
+												"name": "update watermark",
+												"type": "Script",
+												"dependsOn": [
+													{
+														"activity": "Copy data Orders incremental",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												},
+												"typeProperties": {
+													"scripts": [
+														{
+															"type": "Query",
+															"text": {
+																"value": "UPDATE WatermarkTable\nSET LastUpdated = (SELECT MAX(@{item().Incremental_key}) FROM @{item().table_name}) \nwhere Tablename = '@{item().table_name}'",
+																"type": "Expression"
+															}
+														}
+													],
+													"scriptBlockExecutionTimeout": "02:00:00"
+												}
 											}
 										]
 									},
