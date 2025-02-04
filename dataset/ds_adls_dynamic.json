@@ -8,6 +8,9 @@
 		"parameters": {
 			"table_name": {
 				"type": "string"
+			},
+			"destination": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -19,8 +22,10 @@
 					"value": "@dataset().table_name",
 					"type": "Expression"
 				},
-				"folderPath": "data/staging/Test",
-				"fileSystem": "gcpl"
+				"fileSystem": {
+					"value": "@dataset().destination",
+					"type": "Expression"
+				}
 			},
 			"compressionCodec": "snappy"
 		},

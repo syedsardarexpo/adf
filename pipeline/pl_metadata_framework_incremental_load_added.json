@@ -1,5 +1,5 @@
 {
-	"name": "pl_metadata_framework_with_switch",
+	"name": "pl_metadata_framework_incremental_load_added",
 	"properties": {
 		"activities": [
 			{
@@ -138,7 +138,7 @@
 										"value": "incremental",
 										"activities": [
 											{
-												"name": "Copy data incremental",
+												"name": "Copy data Orders incremental",
 												"type": "Copy",
 												"dependsOn": [],
 												"policy": {
@@ -152,7 +152,8 @@
 												"typeProperties": {
 													"source": {
 														"type": "AzureSqlSource",
-														"queryTimeout": "02:00:00",
+														"sqlReaderQuery": "select  * from @{item().schema}.@{item().table_name} where lastupdated > (select max(LastUpdated) from [dbo].[WatermarkTable] where Tablename = 'Orders_Incremental')",
+														"queryTimeout": "00:12:00",
 														"partitionOption": "None"
 													},
 													"sink": {
@@ -167,6 +168,70 @@
 													"enableStaging": false,
 													"translator": {
 														"type": "TabularTranslator",
+														"mappings": [
+															{
+																"source": {
+																	"name": "OrderID",
+																	"type": "Int32",
+																	"physicalType": "int"
+																},
+																"sink": {
+																	"name": "OrderID",
+																	"type": "Int32",
+																	"physicalType": "INT_32"
+																}
+															},
+															{
+																"source": {
+																	"name": "CustomerID",
+																	"type": "Int32",
+																	"physicalType": "int"
+																},
+																"sink": {
+																	"name": "CustomerID",
+																	"type": "Int32",
+																	"physicalType": "INT_32"
+																}
+															},
+															{
+																"source": {
+																	"name": "OrderDate",
+																	"type": "DateTime",
+																	"physicalType": "datetime"
+																},
+																"sink": {
+																	"name": "OrderDate",
+																	"type": "DateTime",
+																	"physicalType": "INT_96"
+																}
+															},
+															{
+																"source": {
+																	"name": "Amount",
+																	"type": "Decimal",
+																	"physicalType": "decimal",
+																	"scale": 2,
+																	"precision": 10
+																},
+																"sink": {
+																	"name": "Amount",
+																	"type": "Decimal",
+																	"physicalType": "DECIMAL"
+																}
+															},
+															{
+																"source": {
+																	"name": "LastUpdated",
+																	"type": "DateTime",
+																	"physicalType": "datetime"
+																},
+																"sink": {
+																	"name": "LastUpdated",
+																	"type": "DateTime",
+																	"physicalType": "INT_96"
+																}
+															}
+														],
 														"typeConversion": true,
 														"typeConversionSettings": {
 															"allowDataTruncation": true,
@@ -199,7 +264,10 @@
 																"value": "@item().table_name",
 																"type": "Expression"
 															},
-															"destination": "@item().destination"
+															"destination": {
+																"value": "@item().destination",
+																"type": "Expression"
+															}
 														}
 													}
 												]
