@@ -55,7 +55,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"on": {
-									"value": "item().table_name",
+									"value": "@string(item().table_name)",
 									"type": "Expression"
 								},
 								"cases": [
