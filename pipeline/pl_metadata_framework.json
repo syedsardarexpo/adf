@@ -109,6 +109,10 @@
 										"table_name": {
 											"value": "@item().table_name",
 											"type": "Expression"
+										},
+										"destination": {
+											"value": "@item().destination",
+											"type": "Expression"
 										}
 									}
 								}
