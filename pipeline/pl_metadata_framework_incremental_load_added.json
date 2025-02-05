@@ -49,7 +49,7 @@
 					},
 					"activities": [
 						{
-							"name": "Switch1",
+							"name": "Switch between FL and inc",
 							"type": "Switch",
 							"dependsOn": [],
 							"userProperties": [],
