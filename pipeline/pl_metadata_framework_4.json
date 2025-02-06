@@ -756,14 +756,14 @@
 														},
 														"RowsCopied": {
 															"value": {
-																"value": "@activity('Copy data Orders incremental').output.rowsCopied",
+																"value": "@if(contains(activity('Copy data Orders incremental').output, 'rowsCopied'), activity('Copy data Orders incremental').output.rowsCopied, null)\n",
 																"type": "Expression"
 															},
 															"type": "Decimal"
 														},
 														"RowsRead": {
 															"value": {
-																"value": "@activity('Copy data Orders incremental').output.rowsRead",
+																"value": "@if(contains(activity('Copy data Orders incremental').output, 'rowsCopied'), activity('Copy data Orders incremental').output.rowsRead, null)\n",
 																"type": "Expression"
 															},
 															"type": "Decimal"
