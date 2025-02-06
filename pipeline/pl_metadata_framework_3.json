@@ -246,6 +246,22 @@
 												"typeProperties": {
 													"source": {
 														"type": "AzureSqlSource",
+														"additionalColumns": [
+															{
+																"name": "UpdateTime",
+																"value": {
+																	"value": "@utcNow()",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "PipelineName",
+																"value": {
+																	"value": "@pipeline().Pipeline",
+																	"type": "Expression"
+																}
+															}
+														],
 														"sqlReaderQuery": {
 															"value": "select  * from @{item().schema}.@{item().table_name} where @{item().Incremental_key} > (select max(LastUpdated) from [dbo].[WatermarkTable] where Tablename = '@{item().table_name}')",
 															"type": "Expression"
