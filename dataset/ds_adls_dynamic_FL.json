@@ -1,0 +1,34 @@
+{
+	"name": "ds_adls_dynamic_FL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_gen2_product_cat",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"table_name": {
+				"type": "string"
+			},
+			"destination": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().table_name",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().destination",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
