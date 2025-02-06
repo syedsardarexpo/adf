@@ -77,6 +77,22 @@
 												"typeProperties": {
 													"source": {
 														"type": "AzureSqlSource",
+														"additionalColumns": [
+															{
+																"name": "UpdateTime",
+																"value": {
+																	"value": "@utcNow()",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "PipelineName",
+																"value": {
+																	"value": "@pipeline().Pipeline",
+																	"type": "Expression"
+																}
+															}
+														],
 														"queryTimeout": "02:00:00",
 														"partitionOption": "None"
 													},
@@ -117,7 +133,7 @@
 												],
 												"outputs": [
 													{
-														"referenceName": "ds_adls_dynamic_inc",
+														"referenceName": "ds_adls_dynamic_FL",
 														"type": "DatasetReference",
 														"parameters": {
 															"table_name": {
