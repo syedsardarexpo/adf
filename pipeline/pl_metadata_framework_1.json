@@ -103,7 +103,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_adls_dynamic",
+									"referenceName": "ds_adls_dynamic_inc",
 									"type": "DatasetReference",
 									"parameters": {
 										"table_name": {

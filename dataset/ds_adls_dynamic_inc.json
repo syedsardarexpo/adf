@@ -1,5 +1,5 @@
 {
-	"name": "ds_adls_dynamic",
+	"name": "ds_adls_dynamic_inc",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_adls_gen2_product_cat",
