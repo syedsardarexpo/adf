@@ -277,7 +277,7 @@
 															},
 															"type": "String"
 														},
-														"Proccessed": {
+														"Processed": {
 															"value": "Y",
 															"type": "String"
 														},
@@ -370,7 +370,7 @@
 															},
 															"type": "String"
 														},
-														"Proccessed": {
+														"Processed": {
 															"value": "N",
 															"type": "String"
 														},
@@ -558,7 +558,7 @@
 															},
 															"type": "String"
 														},
-														"Proccessed": {
+														"Processed": {
 															"value": "Y",
 															"type": "String"
 														},
@@ -651,7 +651,7 @@
 															},
 															"type": "String"
 														},
-														"Proccessed": {
+														"Processed": {
 															"value": "N",
 															"type": "String"
 														},
