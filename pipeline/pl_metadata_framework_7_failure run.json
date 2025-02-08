@@ -1,7 +1,7 @@
 {
-	"name": "pl_metadata_framework_5_copy1",
+	"name": "pl_metadata_framework_7_failure run",
 	"properties": {
-		"description": "adding non timestamp as an incremental column",
+		"description": "added the running only the failed tables logic.\nNeed to run a config refresh before running normal pipeline in order to set all tables as N",
 		"activities": [
 			{
 				"name": "List tables",
