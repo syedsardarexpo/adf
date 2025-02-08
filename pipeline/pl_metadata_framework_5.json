@@ -419,7 +419,7 @@
 										"value": "incremental",
 										"activities": [
 											{
-												"name": "Copy data Orders incremental",
+												"name": "Copy data incremental",
 												"type": "Copy",
 												"dependsOn": [],
 												"policy": {
@@ -513,7 +513,7 @@
 												"type": "SqlServerStoredProcedure",
 												"dependsOn": [
 													{
-														"activity": "Copy data Orders incremental",
+														"activity": "Copy data incremental",
 														"dependencyConditions": [
 															"Succeeded"
 														]
@@ -606,7 +606,7 @@
 												"type": "SqlServerStoredProcedure",
 												"dependsOn": [
 													{
-														"activity": "Copy data Orders incremental",
+														"activity": "Copy data incremental",
 														"dependencyConditions": [
 															"Failed"
 														]
