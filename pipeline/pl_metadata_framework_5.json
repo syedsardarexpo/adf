@@ -532,7 +532,7 @@
 													"storedProcedureParameters": {
 														"Errors": {
 															"value": {
-																"value": "@activity('Copy data Orders incremental').output.errors",
+																"value": "@activity('Copy data incremental').output.errors",
 																"type": "Expression"
 															},
 															"type": "String"
@@ -564,14 +564,14 @@
 														},
 														"RowsCopied": {
 															"value": {
-																"value": "@activity('Copy data Orders incremental').output.rowsCopied",
+																"value": "@activity('Copy data incremental').output.rowsCopied",
 																"type": "Expression"
 															},
 															"type": "Decimal"
 														},
 														"RowsRead": {
 															"value": {
-																"value": "@activity('Copy data Orders incremental').output.rowsRead",
+																"value": "@activity('Copy data incremental').output.rowsRead",
 																"type": "Expression"
 															},
 															"type": "Decimal"
@@ -625,7 +625,7 @@
 													"storedProcedureParameters": {
 														"Errors": {
 															"value": {
-																"value": "@activity('Copy data Orders incremental').output.errors",
+																"value": "@activity('Copy data incremental').output.errors",
 																"type": "Expression"
 															},
 															"type": "String"
@@ -657,14 +657,14 @@
 														},
 														"RowsCopied": {
 															"value": {
-																"value": "@if(contains(activity('Copy data Orders incremental').output, 'rowsCopied'), activity('Copy data Orders incremental').output.rowsCopied, null)\n",
+																"value": "@if(contains(activity('Copy data incremental').output, 'rowsCopied'), activity('Copy data incremental').output.rowsCopied, null)\n",
 																"type": "Expression"
 															},
 															"type": "Decimal"
 														},
 														"RowsRead": {
 															"value": {
-																"value": "@if(contains(activity('Copy data Orders incremental').output, 'rowsCopied'), activity('Copy data Orders incremental').output.rowsRead, null)\n",
+																"value": "@if(contains(activity('Copy data incremental').output, 'rowsCopied'), activity('Copy data incremental').output.rowsRead, null)\n",
 																"type": "Expression"
 															},
 															"type": "Decimal"
@@ -692,6 +692,42 @@
 												"linkedServiceName": {
 													"referenceName": "ls_sqldatabase",
 													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "update watermark",
+												"type": "Script",
+												"dependsOn": [
+													{
+														"activity": "Copy data incremental",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												},
+												"typeProperties": {
+													"scripts": [
+														{
+															"type": "Query",
+															"text": {
+																"value": "DECLARE @IncrementType VARCHAR(10);\n\n-- Determine if the table uses ID or Timestamp for increment\nSELECT @IncrementType = \n    CASE \n        WHEN NonTimestampCol IS NOT NULL THEN 'ID'\n        WHEN Timestamp_col IS NOT NULL THEN 'Timestamp'\n    END\nFROM [dbo].[WatermarkTable_poc] \nWHERE Tablename = '@{item().table_name}';\n\nIF @IncrementType = 'ID'\nBEGIN\n    \nUPDATE WatermarkTable_poc\nSET NonTimestampCol = (SELECT MAX(@{item().Incremental_key}) FROM @{item().table_name})\nwhere Tablename = '@{item().table_name}'\t\n\nEND\nELSE IF @IncrementType = 'Timestamp'\nBEGIN\n    \nUPDATE WatermarkTable_poc\nSET Timestamp_col = (SELECT MAX(@{item().Incremental_key}) FROM @{item().table_name})\nwhere Tablename = '@{item().table_name}'\n\nEND\nELSE\nBEGIN\n    PRINT 'No valid watermark found!';\nEND\n",
+																"type": "Expression"
+															}
+														}
+													],
+													"scriptBlockExecutionTimeout": "02:00:00"
 												}
 											}
 										]
