@@ -151,84 +151,6 @@
 												]
 											},
 											{
-												"name": "Audit update full load",
-												"type": "SqlServerStoredProcedure",
-												"dependsOn": [
-													{
-														"activity": "Copy data full load",
-														"dependencyConditions": [
-															"Succeeded"
-														]
-													}
-												],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"storedProcedureName": "[dbo].[usp_Audit_log]",
-													"storedProcedureParameters": {
-														"Errors": {
-															"value": {
-																"value": "@activity('Copy data full load').output.errors",
-																"type": "Expression"
-															},
-															"type": "String"
-														},
-														"ExecDate": {
-															"value": {
-																"value": "@pipeline().TriggerTime",
-																"type": "Expression"
-															},
-															"type": "Datetime"
-														},
-														"PiplineName": {
-															"value": {
-																"value": "@pipeline().Pipeline",
-																"type": "Expression"
-															},
-															"type": "String"
-														},
-														"RowsCopied": {
-															"value": {
-																"value": "@activity('Copy data full load').output.rowsCopied",
-																"type": "Expression"
-															},
-															"type": "Decimal"
-														},
-														"RowsRead": {
-															"value": {
-																"value": "@activity('Copy data full load').output.rowsRead",
-																"type": "Expression"
-															},
-															"type": "Decimal"
-														},
-														"Source": {
-															"value": {
-																"value": "@item().table_name",
-																"type": "Expression"
-															},
-															"type": "String"
-														},
-														"Target": {
-															"value": {
-																"value": "@item().destination",
-																"type": "Expression"
-															},
-															"type": "String"
-														}
-													}
-												},
-												"linkedServiceName": {
-													"referenceName": "ls_sqldatabase",
-													"type": "LinkedServiceReference"
-												}
-											},
-											{
 												"name": "Successful Audit update FL",
 												"type": "SqlServerStoredProcedure",
 												"dependsOn": [
@@ -405,6 +327,83 @@
 																"value": "@item().destination",
 																"type": "Expression"
 															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "Successful update config",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data full load",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[update_config_status]",
+													"storedProcedureParameters": {
+														"processed": {
+															"value": "Y",
+															"type": "String"
+														},
+														"tablename": {
+															"value": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "Unsuccessful update config",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data full load",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[update_config_status]",
+													"storedProcedureParameters": {
+														"processed": {
+															"value": "N",
+															"type": "String"
+														},
+														"tablename": {
+															"value": "@item().table_name",
 															"type": "String"
 														}
 													}
@@ -730,6 +729,46 @@
 													],
 													"scriptBlockExecutionTimeout": "02:00:00"
 												}
+											},
+											{
+												"name": "Successful update config inc",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data incremental",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[update_config_status]",
+													"storedProcedureParameters": {
+														"processed": {
+															"value": "Y",
+															"type": "String"
+														},
+														"tablename": {
+															"value": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
 											}
 										]
 									},
@@ -806,6 +845,18 @@
 										]
 									}
 								]
+							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().processed,'N')",
+									"type": "Expression"
+								}
 							}
 						}
 					]
