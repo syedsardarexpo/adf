@@ -1,0 +1,880 @@
+{
+	"name": "pl_metadata_framework_5",
+	"properties": {
+		"description": "adding non timestamp as an incremental column",
+		"activities": [
+			{
+				"name": "List tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_adls_config",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "List tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('List tables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Switch between FL and inc",
+							"type": "Switch",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"on": {
+									"value": "@string(item().table_type)",
+									"type": "Expression"
+								},
+								"cases": [
+									{
+										"value": "full_load",
+										"activities": [
+											{
+												"name": "Copy data full load",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"additionalColumns": [
+															{
+																"name": "UpdateTime",
+																"value": {
+																	"value": "@utcNow()",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "PipelineName",
+																"value": {
+																	"value": "@pipeline().Pipeline",
+																	"type": "Expression"
+																}
+															}
+														],
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"sink": {
+														"type": "ParquetSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings"
+														},
+														"formatSettings": {
+															"type": "ParquetWriteSettings"
+														}
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "ds_azuresql_dyanamic_tables",
+														"type": "DatasetReference",
+														"parameters": {
+															"table_name": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"schema": {
+																"value": "@item().schema",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "ds_adls_dynamic_FL",
+														"type": "DatasetReference",
+														"parameters": {
+															"table_name": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"destination": {
+																"value": "@item().destination",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "Audit update full load",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data full load",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[usp_Audit_log]",
+													"storedProcedureParameters": {
+														"Errors": {
+															"value": {
+																"value": "@activity('Copy data full load').output.errors",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"ExecDate": {
+															"value": {
+																"value": "@pipeline().TriggerTime",
+																"type": "Expression"
+															},
+															"type": "Datetime"
+														},
+														"PiplineName": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"RowsCopied": {
+															"value": {
+																"value": "@activity('Copy data full load').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"RowsRead": {
+															"value": {
+																"value": "@activity('Copy data full load').output.rowsRead",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"Source": {
+															"value": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Target": {
+															"value": {
+																"value": "@item().destination",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "Successful Audit update FL",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data full load",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[usp_update_Audit_log]",
+													"storedProcedureParameters": {
+														"Errors": {
+															"value": {
+																"value": "@activity('Copy data full load').output.errors",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"ExecDate": {
+															"value": {
+																"value": "@utcNow()",
+																"type": "Expression"
+															},
+															"type": "Datetime"
+														},
+														"PipelineName": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"PipelineRunID": {
+															"value": {
+																"value": "@pipeline().RunId",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Proccessed": {
+															"value": "Y",
+															"type": "String"
+														},
+														"RowsCopied": {
+															"value": {
+																"value": "@activity('Copy data full load').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"RowsRead": {
+															"value": {
+																"value": "@activity('Copy data full load').output.rowsRead",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"Source": {
+															"value": "need to code",
+															"type": "String"
+														},
+														"TableName": {
+															"value": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Target": {
+															"value": {
+																"value": "@item().destination",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "Unsuccessful Audit update FL",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data full load",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[usp_update_Audit_log]",
+													"storedProcedureParameters": {
+														"Errors": {
+															"value": {
+																"value": "@activity('Copy data full load').output.errors",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"ExecDate": {
+															"value": {
+																"value": "@utcNow()",
+																"type": "Expression"
+															},
+															"type": "Datetime"
+														},
+														"PipelineName": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"PipelineRunID": {
+															"value": {
+																"value": "@pipeline().RunId",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Proccessed": {
+															"value": "N",
+															"type": "String"
+														},
+														"RowsCopied": {
+															"value": {
+																"value": "@activity('Copy data full load').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"RowsRead": {
+															"value": {
+																"value": "@activity('Copy data full load').output.rowsRead",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"Source": {
+															"value": "need to code",
+															"type": "String"
+														},
+														"TableName": {
+															"value": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Target": {
+															"value": {
+																"value": "@item().destination",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									},
+									{
+										"value": "incremental",
+										"activities": [
+											{
+												"name": "Copy data Orders incremental",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"additionalColumns": [
+															{
+																"name": "UpdateTime",
+																"value": {
+																	"value": "@utcNow()",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "PipelineName",
+																"value": {
+																	"value": "@pipeline().Pipeline",
+																	"type": "Expression"
+																}
+															}
+														],
+														"sqlReaderQuery": {
+															"value": "select  * from @{item().schema}.@{item().table_name} where @{item().Incremental_key} > (select max(LastUpdated) from [dbo].[WatermarkTable] where Tablename = '@{item().table_name}')",
+															"type": "Expression"
+														},
+														"queryTimeout": "00:12:00",
+														"partitionOption": "None"
+													},
+													"sink": {
+														"type": "ParquetSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings"
+														},
+														"formatSettings": {
+															"type": "ParquetWriteSettings"
+														}
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"mappings": [
+															{
+																"source": {
+																	"name": "OrderID",
+																	"type": "Int32",
+																	"physicalType": "int"
+																},
+																"sink": {
+																	"name": "OrderID",
+																	"type": "Int32",
+																	"physicalType": "INT_32"
+																}
+															},
+															{
+																"source": {
+																	"name": "CustomerID",
+																	"type": "Int32",
+																	"physicalType": "int"
+																},
+																"sink": {
+																	"name": "CustomerID",
+																	"type": "Int32",
+																	"physicalType": "INT_32"
+																}
+															},
+															{
+																"source": {
+																	"name": "OrderDate",
+																	"type": "DateTime",
+																	"physicalType": "datetime"
+																},
+																"sink": {
+																	"name": "OrderDate",
+																	"type": "DateTime",
+																	"physicalType": "INT_96"
+																}
+															},
+															{
+																"source": {
+																	"name": "Amount",
+																	"type": "Decimal",
+																	"physicalType": "decimal",
+																	"scale": 2,
+																	"precision": 10
+																},
+																"sink": {
+																	"name": "Amount",
+																	"type": "Decimal",
+																	"physicalType": "DECIMAL"
+																}
+															},
+															{
+																"source": {
+																	"name": "LastUpdated",
+																	"type": "DateTime",
+																	"physicalType": "datetime"
+																},
+																"sink": {
+																	"name": "LastUpdated",
+																	"type": "DateTime",
+																	"physicalType": "INT_96"
+																}
+															}
+														],
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "ds_azuresql_dyanamic_tables",
+														"type": "DatasetReference",
+														"parameters": {
+															"table_name": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"schema": {
+																"value": "@item().schema",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "ds_adls_dynamic_inc",
+														"type": "DatasetReference",
+														"parameters": {
+															"table_name": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"destination": {
+																"value": "@item().destination",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "update watermark",
+												"type": "Script",
+												"dependsOn": [
+													{
+														"activity": "Copy data Orders incremental",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												},
+												"typeProperties": {
+													"scripts": [
+														{
+															"type": "Query",
+															"text": {
+																"value": "UPDATE WatermarkTable\nSET LastUpdated = (SELECT MAX(@{item().Incremental_key}) FROM @{item().table_name}) \nwhere Tablename = '@{item().table_name}'",
+																"type": "Expression"
+															}
+														}
+													],
+													"scriptBlockExecutionTimeout": "02:00:00"
+												}
+											},
+											{
+												"name": "Successful Audit update",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data Orders incremental",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[usp_update_Audit_log]",
+													"storedProcedureParameters": {
+														"Errors": {
+															"value": {
+																"value": "@activity('Copy data Orders incremental').output.errors",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"ExecDate": {
+															"value": {
+																"value": "@utcNow()",
+																"type": "Expression"
+															},
+															"type": "Datetime"
+														},
+														"PipelineName": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"PipelineRunID": {
+															"value": {
+																"value": "@pipeline().RunId",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Proccessed": {
+															"value": "Y",
+															"type": "String"
+														},
+														"RowsCopied": {
+															"value": {
+																"value": "@activity('Copy data Orders incremental').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"RowsRead": {
+															"value": {
+																"value": "@activity('Copy data Orders incremental').output.rowsRead",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"Source": {
+															"value": "need to code",
+															"type": "String"
+														},
+														"TableName": {
+															"value": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Target": {
+															"value": {
+																"value": "@item().destination",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "UnSuccessful Audit update",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy data Orders incremental",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[dbo].[usp_update_Audit_log]",
+													"storedProcedureParameters": {
+														"Errors": {
+															"value": {
+																"value": "@activity('Copy data Orders incremental').output.errors",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"ExecDate": {
+															"value": {
+																"value": "@utcNow()",
+																"type": "Expression"
+															},
+															"type": "Datetime"
+														},
+														"PipelineName": {
+															"value": {
+																"value": "@pipeline().Pipeline",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"PipelineRunID": {
+															"value": {
+																"value": "@pipeline().RunId",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Proccessed": {
+															"value": "N",
+															"type": "String"
+														},
+														"RowsCopied": {
+															"value": {
+																"value": "@if(contains(activity('Copy data Orders incremental').output, 'rowsCopied'), activity('Copy data Orders incremental').output.rowsCopied, null)\n",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"RowsRead": {
+															"value": {
+																"value": "@if(contains(activity('Copy data Orders incremental').output, 'rowsCopied'), activity('Copy data Orders incremental').output.rowsRead, null)\n",
+																"type": "Expression"
+															},
+															"type": "Decimal"
+														},
+														"Source": {
+															"value": "need to code",
+															"type": "String"
+														},
+														"TableName": {
+															"value": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"Target": {
+															"value": {
+																"value": "@item().destination",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldatabase",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									},
+									{
+										"value": "scd",
+										"activities": [
+											{
+												"name": "Copy data scd",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"sink": {
+														"type": "ParquetSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings"
+														},
+														"formatSettings": {
+															"type": "ParquetWriteSettings"
+														}
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "ds_azuresql_dyanamic_tables",
+														"type": "DatasetReference",
+														"parameters": {
+															"table_name": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"schema": {
+																"value": "@item().schema",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "ds_adls_dynamic_inc",
+														"type": "DatasetReference",
+														"parameters": {
+															"table_name": {
+																"value": "@item().table_name",
+																"type": "Expression"
+															},
+															"destination": "@item().destination"
+														}
+													}
+												]
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}
