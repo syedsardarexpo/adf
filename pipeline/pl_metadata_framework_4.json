@@ -1,6 +1,7 @@
 {
 	"name": "pl_metadata_framework_4",
 	"properties": {
+		"description": "added : \n1)successful, unsuccessful processing column in audit\n2)added audit in every target table\n3)added email alert through azure monitor",
 		"activities": [
 			{
 				"name": "List tables",
