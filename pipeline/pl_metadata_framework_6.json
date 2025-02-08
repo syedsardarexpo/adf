@@ -65,7 +65,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@contains(activity('Get Unprocessed Tables').output.value, item().table_name)\n",
+									"value": "@contains(concat(',', join(activity('Get Unprocessed Tables').output.value, ','), ','), concat(',', item().table_name, ','))\n",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
