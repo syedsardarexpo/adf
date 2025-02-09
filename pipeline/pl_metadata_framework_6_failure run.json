@@ -1,5 +1,5 @@
 {
-	"name": "pl_metadata_framework_7_failure run",
+	"name": "pl_metadata_framework_6_failure run",
 	"properties": {
 		"description": "added the running only the failed tables logic.\nNeed to run a config refresh before running normal pipeline in order to set all tables as N",
 		"activities": [
@@ -425,7 +425,10 @@
 																		"type": "String"
 																	},
 																	"tablename": {
-																		"value": "@item().table_name",
+																		"value": {
+																			"value": "@item().table_name",
+																			"type": "Expression"
+																		},
 																		"type": "String"
 																	}
 																}
