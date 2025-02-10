@@ -1,7 +1,7 @@
 {
 	"name": "pl_metadata_framework_7_failure run",
 	"properties": {
-		"description": "clone of 6 (failure run with added source info) work in progress\n",
+		"description": "clone of 6 (failure run with added source info) work in progress\n1) @and(equals(item().processed, 'N'), equals(item().status, 'Pending'))\n",
 		"activities": [
 			{
 				"name": "List tables",
