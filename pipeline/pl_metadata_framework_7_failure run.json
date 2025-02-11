@@ -1,7 +1,7 @@
 {
 	"name": "pl_metadata_framework_7_failure run",
 	"properties": {
-		"description": "clone of 6.\n1)creating unified config and watermark table",
+		"description": "clone of 6.\n1)creating unified config and watermark table\n2)new sp to update config table : [dbo].[update_config_status_2] ",
 		"activities": [
 			{
 				"name": "List tables",
@@ -378,50 +378,10 @@
 															},
 															"userProperties": [],
 															"typeProperties": {
-																"storedProcedureName": "[dbo].[update_config_status]",
+																"storedProcedureName": "[dbo].[update_config_status_2]",
 																"storedProcedureParameters": {
 																	"processed": {
 																		"value": "Y",
-																		"type": "String"
-																	},
-																	"tablename": {
-																		"value": {
-																			"value": "@item().table_name",
-																			"type": "Expression"
-																		},
-																		"type": "String"
-																	}
-																}
-															},
-															"linkedServiceName": {
-																"referenceName": "ls_sqldatabase",
-																"type": "LinkedServiceReference"
-															}
-														},
-														{
-															"name": "Unsuccessful update config",
-															"type": "SqlServerStoredProcedure",
-															"dependsOn": [
-																{
-																	"activity": "Copy data full load",
-																	"dependencyConditions": [
-																		"Failed"
-																	]
-																}
-															],
-															"policy": {
-																"timeout": "0.12:00:00",
-																"retry": 0,
-																"retryIntervalInSeconds": 30,
-																"secureOutput": false,
-																"secureInput": false
-															},
-															"userProperties": [],
-															"typeProperties": {
-																"storedProcedureName": "[dbo].[update_config_status]",
-																"storedProcedureParameters": {
-																	"processed": {
-																		"value": "N",
 																		"type": "String"
 																	},
 																	"tablename": {
@@ -794,78 +754,6 @@
 																"referenceName": "ls_sqldatabase",
 																"type": "LinkedServiceReference"
 															}
-														}
-													]
-												},
-												{
-													"value": "scd",
-													"activities": [
-														{
-															"name": "Copy data scd",
-															"type": "Copy",
-															"dependsOn": [],
-															"policy": {
-																"timeout": "0.12:00:00",
-																"retry": 0,
-																"retryIntervalInSeconds": 30,
-																"secureOutput": false,
-																"secureInput": false
-															},
-															"userProperties": [],
-															"typeProperties": {
-																"source": {
-																	"type": "AzureSqlSource",
-																	"queryTimeout": "02:00:00",
-																	"partitionOption": "None"
-																},
-																"sink": {
-																	"type": "ParquetSink",
-																	"storeSettings": {
-																		"type": "AzureBlobFSWriteSettings"
-																	},
-																	"formatSettings": {
-																		"type": "ParquetWriteSettings"
-																	}
-																},
-																"enableStaging": false,
-																"translator": {
-																	"type": "TabularTranslator",
-																	"typeConversion": true,
-																	"typeConversionSettings": {
-																		"allowDataTruncation": true,
-																		"treatBooleanAsNumber": false
-																	}
-																}
-															},
-															"inputs": [
-																{
-																	"referenceName": "ds_azuresql_dyanamic_tables",
-																	"type": "DatasetReference",
-																	"parameters": {
-																		"table_name": {
-																			"value": "@item().table_name",
-																			"type": "Expression"
-																		},
-																		"schema": {
-																			"value": "@item().schema_name",
-																			"type": "Expression"
-																		}
-																	}
-																}
-															],
-															"outputs": [
-																{
-																	"referenceName": "ds_adls_dynamic_inc",
-																	"type": "DatasetReference",
-																	"parameters": {
-																		"table_name": {
-																			"value": "@item().table_name",
-																			"type": "Expression"
-																		},
-																		"destination": "@item().destination"
-																	}
-																}
-															]
 														}
 													]
 												}
